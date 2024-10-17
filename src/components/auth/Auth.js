@@ -102,20 +102,20 @@ function Auth() {
 
                 const response = await signup(mergedData);
 
-                if(response.message !==  "") {
-                    console.log('I am expecting th toastify to pop');
-                    toast.success(response.message, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        theme: "dark",
-                        transition: Bounce,
-                    })
-                }
+                // if(response.message !==  "") {
+                //     console.log('I am expecting th toastify to pop');
+                //     toast.success(response.message, {
+                //         position: "top-center",
+                //         autoClose: 5000,
+                //         hideProgressBar: false,
+                //         closeOnClick: true,
+                //         pauseOnHover: true,
+                //         draggable: true,
+                //         progress: undefined,
+                //         theme: "dark",
+                //         transition: Bounce,
+                //     })
+                // }
 
                 console.log('The API response:', response.message);
                 // toast.success(response.message);
@@ -124,17 +124,17 @@ function Auth() {
                 console.log('Password:', formData.password);
 
                 const response = await login(formData);
-                toast.success(response.message, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                    transition: Bounce,
-                })
+                // toast.success(response.message, {
+                //     position: "top-center",
+                //     autoClose: 5000,
+                //     hideProgressBar: false,
+                //     closeOnClick: true,
+                //     pauseOnHover: true,
+                //     draggable: true,
+                //     progress: undefined,
+                //     theme: "dark",
+                //     transition: Bounce,
+                // })
                 console.log('The API response:', response.message);
             }
         } catch (error) {
@@ -149,17 +149,17 @@ function Auth() {
             } else {
                 // Handle API errors (e.g., 501 status code or other API issues)
                 console.error('API error:', error.message);
-                toast.error(error.message, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "dark",
-                    transition: Bounce,
-                });
+                // toast.error(error.message, {
+                //     position: "top-center",
+                //     autoClose: 5000,
+                //     hideProgressBar: false,
+                //     closeOnClick: true,
+                //     pauseOnHover: true,
+                //     draggable: true,
+                //     progress: undefined,
+                //     theme: "dark",
+                //     transition: Bounce,
+                // });
                 setError({ api: error.message || 'Something went wrong with the API' });
             }
         }
