@@ -4,25 +4,20 @@ import * as Yup from "yup";
 import './Auth.css';
 import { login, signup } from "./AuthService";
 import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import toastify styles
 
-
-/**
- * Component for user authentication
- */
 function Auth() {
-    // State variables
     const [isSignUp, setIsSignUp] = useState(true);
     const [isSignIn, setIsSignIn] = useState(false);
     const [error, setError] = useState({});
-    const [isValid, setIsValid] = useState(false); // Track form validity
-
+    const [isValid, setIsValid] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
         password: '',
     });
 
-    // Content for different scenarios
     const content = [
         {
             greeting: "Hello Friend!",
@@ -36,7 +31,6 @@ function Auth() {
         }
     ];
 
-    // Form field details
     const form_field = [
         {
             title: 'Create Account',
@@ -50,7 +44,6 @@ function Auth() {
         }
     ];
 
-    // Form validation schema
     const validationSchema = Yup.object({
         fullName: Yup.string().when("isSignUp", {
             is: true,
@@ -60,114 +53,51 @@ function Auth() {
         password: Yup.string().required('Please enter your password').min(6, 'Password must be at least 6 characters'),
     });
 
-    /**
-     * Handle change in form input fields
-     * @param {Event} event - Event object
-     */
     const handleChange = (event) => {
         const { name, value } = event.target;
         setFormData({ ...formData, [name]: value });
 
-        // Revalidate the form on change
         validationSchema.validate(formData, { abortEarly: false, context: { isSignUp } })
             .then(() => setIsValid(true))
             .catch(() => setIsValid(false));
     };
 
-    /**
-     * Handle form submission
-     * @param {Event} e - Event object
-     */
     const submitForm = async (e) => {
         e.preventDefault();
-        console.log('Form submitted successfully', formData);
-        console.log('The signup value is:', isSignUp);
-        console.log('The signin value is:', isSignIn);
+        setLoading(true);
         try {
             await validationSchema.validate(formData, { abortEarly: false, context: { isSignUp } });
-            console.log('Form submitted successfully', formData);
 
             if (isSignUp) {
-                console.log('Full Name:', formData.fullName);
-                console.log('Email:', formData.email);
-                console.log('Password:', formData.password);
-
-                const emergencyData = {
-                    age: 20,
-                };
-
-                const mergedData = {
-                    ...formData, ...emergencyData
-                };
-
+                const emergencyData = { age: 20 };
+                const mergedData = { ...formData, ...emergencyData };
                 const response = await signup(mergedData);
 
-                // if(response.message !==  "") {
-                //     console.log('I am expecting th toastify to pop');
-                //     toast.success(response.message, {
-                //         position: "top-center",
-                //         autoClose: 5000,
-                //         hideProgressBar: false,
-                //         closeOnClick: true,
-                //         pauseOnHover: true,
-                //         draggable: true,
-                //         progress: undefined,
-                //         theme: "dark",
-                //         transition: Bounce,
-                //     })
-                // }
-
-                console.log('The API response:', response.message);
-                // toast.success(response.message);
+                toast.success(response.message, { transition: Bounce });
             } else {
-                console.log('Email:', formData.email);
-                console.log('Password:', formData.password);
-
                 const response = await login(formData);
-                // toast.success(response.message, {
-                //     position: "top-center",
-                //     autoClose: 5000,
-                //     hideProgressBar: false,
-                //     closeOnClick: true,
-                //     pauseOnHover: true,
-                //     draggable: true,
-                //     progress: undefined,
-                //     theme: "dark",
-                //     transition: Bounce,
-                // })
-                console.log('The API response:', response.message);
+                toast.success(response.message, { transition: Bounce });
             }
         } catch (error) {
             if (error.inner) {
-                // Handle Yup validation errors
-                console.log('Validation errors:', error.inner);
                 const newErrors = {};
                 error.inner.forEach((err) => {
                     newErrors[err.path] = err.message;
                 });
                 setError(newErrors);
+
+                // toast.error("Please fix the highlighted errors", { transition: Bounce });
+                toast.error("Please fix the highlighted errors", { transition: Bounce });
             } else {
-                // Handle API errors (e.g., 501 status code or other API issues)
                 console.error('API error:', error.message);
-                // toast.error(error.message, {
-                //     position: "top-center",
-                //     autoClose: 5000,
-                //     hideProgressBar: false,
-                //     closeOnClick: true,
-                //     pauseOnHover: true,
-                //     draggable: true,
-                //     progress: undefined,
-                //     theme: "dark",
-                //     transition: Bounce,
-                // });
                 setError({ api: error.message || 'Something went wrong with the API' });
+                toast.error(error.message, { transition: Bounce });
             }
+        } finally {
+            setLoading(false);
         }
     };
 
-    /**
-     * Toggle between sign up and sign in modes
-     */
     const toggleButton = () => {
         setIsSignUp(prevIsSignUp => !prevIsSignUp);
         setIsSignIn(prevIsSignIn => !prevIsSignIn);
@@ -186,7 +116,7 @@ function Auth() {
                     </button>
                 </div>
 
-                <form onSubmit={submitForm} className={isSignUp ? "form-container signup" : "form-container signin"}>
+                <form onSubmit={ !loading ? submitForm : null } className={isSignUp ? "form-container signup" : "form-container signin"}>
                     <div className="form-header">
                         <h1>{isSignUp ? form_field[0].title : form_field[1].title}</h1>
                         <p>{isSignUp ? form_field[0].instruction : form_field[1].instruction}</p>
@@ -228,9 +158,13 @@ function Auth() {
                         </div>
                     </div>
 
-                    <button type="submit" className={isValid ? "btn-filled isEnabled" : "btn-filled isDisabled"}>
-                        {isSignUp ? form_field[0].button : form_field[1].button}
-                    </button>
+                    <button
+                            type="submit"
+                            className={ !loading ? "btn-filled isEnabled" : "btn-filled isDisabled"}
+                            disabled={!isValid || loading} // Disable button if loading or form is invalid
+                        >
+                            {loading ? "Processing..." : (isSignUp ? form_field[0].button : form_field[1].button)}
+                        </button>
                 </form>
             </div>
         </div>
@@ -238,6 +172,5 @@ function Auth() {
         </div>
     );
 }
-
 
 export default Auth;
