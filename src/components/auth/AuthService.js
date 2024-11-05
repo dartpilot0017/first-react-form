@@ -1,7 +1,7 @@
 import axios from 'axios';
 // https://emergency-system-0suq.onrender.com/api/v1/auth
-const API_URL = 'https://testapi-diww.onrender.com/';  // Replace with your API URL
-// const API_URL = 'https://emergency-system-0suq.onrender.com/api/v1/auth/';  // Replace with your API URL
+// const API_URL = 'https://testapi-diww.onrender.com/';  // Replace with your API URL
+const API_URL = 'https://emergency-system-0suq.onrender.com/api/v1/auth/';  // Replace with your API URL
 
 
 // User Signup API call
